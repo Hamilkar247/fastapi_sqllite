@@ -1,3 +1,7 @@
 .idea
 __pycache__
+#testowa baza danych
 test.db
+#testowe wiazania encji
+.db.sqlite3:
+

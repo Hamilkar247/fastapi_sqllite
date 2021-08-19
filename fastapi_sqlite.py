@@ -3,6 +3,8 @@ from pydantic import BaseModel
 from typing import Optional, List
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
+from sqlalchemy import Boolean, Column, Float, String, Integer
+
 
 app = FastAPI()
 
@@ -13,12 +15,31 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
+# Depedency
 def get_db():
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
+
+class DBPlace(Base):
+    __tablename__ = 'places'
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(50))
+    description = Column(String, nullable=True)
+    coffee = Column(Boolean)
+    wifi = Column(Boolean)
+    food = Column(Boolean)
+    lat = Column(Float)
+    lng = Column(Float)
+
+
+
+
+Base.metadata.create_all(bind=engine)
 
 
 class Place(BaseModel):
