@@ -3,8 +3,7 @@ from fastapi import APIRouter, Depends
 from typing import Optional, List
 from sqlalchemy.orm import Session
 
-from fastapi_db_sqlite import get_db
-from fastapi_validate_data_pydantic import Place, create_place, get_places, get_place
+from mainx import get_db
 
 router = APIRouter(
     prefix="/places",
@@ -13,13 +12,13 @@ router = APIRouter(
 )
 
 
-@router.post('/places/', response_model=Place)
+@router.post('/places', response_model=Place)
 def create_places_view(place: Place, db: Session = Depends(get_db)):
-    db_place = create_place(db, place)
+    db_place = create_place_db(db, place)
     return db_place
 
 
-@router.get('/places/', response_model=List[Place])
+@router.get('/places', response_model=List[Place])
 def get_places_view(db: Session = Depends(get_db)):
     return get_places(db)
 
