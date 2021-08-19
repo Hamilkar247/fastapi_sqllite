@@ -1,75 +1,14 @@
 from fastapi import FastAPI, Depends
-from pydantic import BaseModel
-from typing import Optional, List
-from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker, Session
-from sqlalchemy import Boolean, Column, Float, String, Integer
 
+import fastapi_db_sqlite
 from api_web import place_api
 
 app = FastAPI()
 app.include_router(place_api.router)
 
-#SqlAlchemy Setup
-SQLALCHEMY_DATABASE_URL = 'sqlite+pysqlite:///.db.sqlite3:'
-engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True, future=True)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+fastapi_db_sqlite.setup_sqlalchemy()
 
 
-# Depedency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-class DBPlace(Base):
-    __tablename__ = 'places'
-
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(50))
-    description = Column(String, nullable=True)
-    coffee = Column(Boolean)
-    wifi = Column(Boolean)
-    food = Column(Boolean)
-    lat = Column(Float)
-    lng = Column(Float)
-
-
-Base.metadata.create_all(bind=engine)
-
-
-class Place(BaseModel):
-    name: str
-    description: Optional[str] = None
-    coffee: bool
-    wifi: bool
-    food: bool
-    lat: float
-    lng: float
-
-    class Config:
-        orm_mode = True
-
-
-def get_place(db: Session, place_id: int):
-    return db.query(DBPlace).where(DBPlace.id == place_id).first()
-
-
-def get_places(db: Session):
-    return db.query(DBPlace).all()
-
-
-def create_place(db: Session, place: Place):
-    db_place = DBPlace(**place.dict())
-    db.add(db_place)
-    db.commit()
-    db.refresh(db_place)
-
-    return db_place
 
 
 @app.get('/')

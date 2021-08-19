@@ -1,9 +1,10 @@
-from main import Place, get_db, create_place, get_places, get_place, app
 from fastapi import APIRouter, Depends
 
 from typing import Optional, List
 from sqlalchemy.orm import Session
 
+from fastapi_db_sqlite import get_db
+from fastapi_validate_data_pydantic import Place, create_place, get_places, get_place
 
 router = APIRouter(
     prefix="/places",
